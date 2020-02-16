@@ -27,5 +27,12 @@ jobs:
               dep ensure
           fi
 
+      - name: Test
+          run: |
+            go test
+            if [ -f Gopkg.toml ]; then
+                curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+                dep ensure
+            fi
       - name: Build
-        run: go build -v ./src/main/starter.go
+        run: go build -o main.exe ./...
