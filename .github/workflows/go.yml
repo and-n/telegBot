@@ -31,3 +31,8 @@ jobs:
         run: go test ./...
       - name: Build
         run: go build ./...
+      - name: Get  artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: telegramBot
+          path: bin/telegramBot
