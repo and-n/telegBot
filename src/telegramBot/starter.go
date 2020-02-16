@@ -1,10 +1,10 @@
 package main
 
 import (
-	"com.test.package/botcode"
 	"fmt"
 	"log"
 	"os"
+	"telegramBot/botcode"
 )
 
 func main() {
