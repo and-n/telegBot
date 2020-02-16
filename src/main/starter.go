@@ -1,11 +1,11 @@
 package main
 
 import (
+	"botcode"
 	"fmt"
 	"log"
 	"os"
 )
-import "botcode"
 
 func main() {
 	fmt.Println("hello!")
