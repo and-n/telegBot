@@ -6,19 +6,19 @@ import (
 	"strings"
 )
 
+const version string = "0.1"
+
 // InitBot -init telegram bot
 func InitBot(key string) (*tgbotapi.BotAPI, tgbotapi.UpdatesChannel) {
+	if len(key) == 0 {
+		log.Panic("API KEY!")
+	}
 	bot, err := tgbotapi.NewBotAPI(key)
 	if err != nil {
 		log.Panic(err)
 	}
-
-	bot.Debug = true
-
 	log.Printf("Authorized on account %s", bot.Self.UserName)
-
 	//return bot
-
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
@@ -51,6 +51,8 @@ func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
 		answer.Text = "pong"
 	case "hello", "hi":
 		answer.Text = "Hello, " + message.From.UserName
+	case "ver", "version":
+		answer.Text = version
 	default:
 		answer.Text = "Sorry"
 	}

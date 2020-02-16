@@ -15,7 +15,6 @@ func main() {
 
 	bot, updates := botcode.InitBot(apiKey)
 
-	bot.Debug = false
 	for update := range updates {
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
