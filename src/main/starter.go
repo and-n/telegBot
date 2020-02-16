@@ -1,7 +1,7 @@
 package main
 
 import (
-	"botcode"
+	"../botcode"
 	"fmt"
 	"log"
 	"os"
