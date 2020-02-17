@@ -32,9 +32,9 @@ jobs:
       - name: Test
         run: go test ./...
       - name: Install
-        run: go install ./... | ls
+        run: go build ./... | ls
       - name: Get  artifacts
         uses: actions/upload-artifact@v1
         with:
           name: telegramBot
-          path: ./
+          path: ./telegBot
