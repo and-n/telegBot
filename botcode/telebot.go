@@ -30,7 +30,7 @@ func InitBot(key string) (*tgbotapi.BotAPI, tgbotapi.UpdatesChannel) {
 func AnswerMessage(message *tgbotapi.Message) tgbotapi.MessageConfig {
 	var answer tgbotapi.MessageConfig
 	answer.ChatID = message.Chat.ID
-	answer.ReplyToMessageID = message.MessageID
+	//answer.ReplyToMessageID = message.MessageID
 	answer.Text = "kill me please"
 
 	if message.IsCommand() {
@@ -46,6 +46,7 @@ func parseCommand(command string, arguments string, at string, answer *tgbotapi.
 }
 
 func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
+
 	switch strings.ToLower(message.Text) {
 	case "ping":
 		answer.Text = "pong"

@@ -1,16 +1,18 @@
 package main
 
 import (
-	"../telegramBot/botcode"
 	"fmt"
+	"github.com/and-n/telegBot/botcode"
 	"log"
 	"os"
 )
 
 func main() {
 	fmt.Println("hello!")
-	fmt.Println("dont forget to set APIkey")
 
+	if len(os.Args) == 1 {
+		log.Fatal("dont forget to set APIkey")
+	}
 	apiKey := os.Args[1]
 
 	bot, updates := botcode.InitBot(apiKey)
