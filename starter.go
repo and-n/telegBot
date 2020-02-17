@@ -22,6 +22,7 @@ func main() {
 			continue
 		}
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+		go botcode.SaveStatistic(update.Message.From)
 
 		msg := botcode.AnswerMessage(update.Message)
 
