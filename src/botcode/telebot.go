@@ -27,6 +27,7 @@ func InitBot(key string) (*tgbotapi.BotAPI, tgbotapi.UpdatesChannel) {
 	return bot, updates
 }
 
+// AnswerMessage - answer on text message
 func AnswerMessage(message *tgbotapi.Message) tgbotapi.MessageConfig {
 	var answer tgbotapi.MessageConfig
 	answer.ChatID = message.Chat.ID

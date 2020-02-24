@@ -9,15 +9,17 @@ import (
 	"time"
 )
 
+// UserStat - stats of users
 type UserStat struct {
 	UserName     string `json:"user_name"`
-	Id           int
+	ID           int
 	MessageCount int       `json:"message_count"`
 	LastTime     time.Time `json:"last_time"`
 }
 
 const fileName = "users.json"
 
+// SaveStatistic - save users stats
 func SaveStatistic(user *tgbotapi.User) {
 	users := make(map[int]UserStat)
 
@@ -36,7 +38,7 @@ func SaveStatistic(user *tgbotapi.User) {
 	if !is {
 		u = UserStat{
 			UserName: user.UserName,
-			Id:       user.ID,
+			ID:       user.ID,
 		}
 	}
 	u.MessageCount++
