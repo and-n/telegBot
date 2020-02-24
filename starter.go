@@ -10,10 +10,13 @@ import (
 func main() {
 	fmt.Println("hello!")
 
-	if len(os.Args) == 1 {
-		log.Fatal("dont forget to set APIkey")
+	apiKey := os.Getenv("API_KEY")
+	if len(apiKey) == 0 {
+		apiKey = os.Args[1]
+		if len(apiKey) == 0 {
+			log.Fatal("dont forget to set APIkey")
+		}
 	}
-	apiKey := os.Args[1]
 
 	bot, updates := botcode.InitBot(apiKey)
 

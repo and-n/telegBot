@@ -1,12 +1,13 @@
 FROM golang:1.13.8
-#FROM golang:latest
 
 WORKDIR /telegBot
 
 COPY go.mod starter.go ./
 COPY src ./src
 
-#ENV GOPATH=./telegBot
+ARG key
+ENV API_KEY $key
+
 
 RUN go mod download
 
