@@ -8,7 +8,6 @@ COPY src ./src
 ARG key
 ENV API_KEY $key
 
-
 RUN go mod download
 
 #COPY . .

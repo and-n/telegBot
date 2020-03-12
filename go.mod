@@ -6,5 +6,5 @@ replace github.com/and-n/telegBot/botcode v1.0.0 => ./src/botcode
 
 require (
 	github.com/and-n/telegBot/botcode v1.0.0
-	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
+	gopkg.in/yaml.v3 v3.0.0-20200121175148-a6ecf24a6d71
 )
