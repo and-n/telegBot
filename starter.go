@@ -16,7 +16,7 @@ func main() {
 		log.Fatal("strange args! it is possible to setup properties file and that it! %n", len(os.Args))
 	}
 	var p *properties.Properties
-	if len(os.Args) == 1 {
+	if len(os.Args) == 2 {
 		p = properties.MustLoadFile(os.Args[1], properties.UTF8)
 	} else {
 		p = properties.MustLoadFile("./configuration/file.properties", properties.UTF8)

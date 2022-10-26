@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	ttlcache "github.com/jellydator/ttlcache/v3"
 	"github.com/magiconair/properties"
 )
 
@@ -12,6 +13,8 @@ const version string = "0.2"
 
 var FIO string
 var KEY string
+
+// var cache *ttlcache.Cache
 
 // InitBot -init telegram bot
 func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesChannel) {
@@ -27,6 +30,12 @@ func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesCh
 	u.Timeout = 60
 
 	updates := bot.GetUpdatesChan(u)
+
+	cache := ttlcache.New[string, string]()
+
+
+
+	go cache.Start()
 
 	return bot, updates
 }
@@ -53,7 +62,8 @@ func AnswerMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
 		answer.ReplyToMessageID = message.MessageID
 		parseString(message, &answer)
 	}
-	bot.Send(message)
+
+	bot.Send(answer)
 }
 
 func parseCommand(command string, arguments string, answer *tgbotapi.MessageConfig) {

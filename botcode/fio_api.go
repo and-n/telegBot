@@ -49,4 +49,8 @@ type Statement struct {
 type Info struct {
 	Currency       string
 	ClosingBalance float32
+	AccountId      int64
+	BankId         int16
+	Iban           string
+	Bic            string
 }
