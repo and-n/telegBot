@@ -2,3 +2,4 @@
 /pkg/
 /*.exe
 /users.json
+configuration/prod.properties
