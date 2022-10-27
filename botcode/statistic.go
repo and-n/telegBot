@@ -2,16 +2,17 @@ package botcode
 
 import (
 	"encoding/json"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type UserStat struct {
 	UserName     string `json:"user_name"`
-	Id           int
+	Id           int64
 	MessageCount int       `json:"message_count"`
 	LastTime     time.Time `json:"last_time"`
 }
@@ -19,7 +20,7 @@ type UserStat struct {
 const fileName = "users.json"
 
 func SaveStatistic(user *tgbotapi.User) {
-	users := make(map[int]UserStat)
+	users := make(map[int64]UserStat)
 
 	var statFile, err = os.OpenFile(fileName, os.O_RDWR, 0666)
 	if err == nil {
@@ -47,7 +48,7 @@ func SaveStatistic(user *tgbotapi.User) {
 	_ = statFile.Close()
 }
 
-func saveUsersStatToFile(usersMap map[int]UserStat, file *os.File) {
+func saveUsersStatToFile(usersMap map[int64]UserStat, file *os.File) {
 	jsn, _ := json.MarshalIndent(usersMap, " ", "")
 	er := ioutil.WriteFile(file.Name(), jsn, os.ModeExclusive)
 	if er != nil {
