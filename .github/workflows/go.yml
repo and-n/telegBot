@@ -13,7 +13,7 @@ jobs:
       - name: Set up Go 1.18
         uses: actions/setup-go@v1
         with:
-          go-version: 1.18
+          go-version-file: 'go.mod'
         id: go
 
       - name: Check out code into the Go module directory
@@ -31,10 +31,13 @@ jobs:
 
       - name: Test
         run: go test ./...
-      - name: Install
-        run: go build ./... | ls
+      - name: Install Win
+        run: env GOOS=`windows` GOARCH=`386` go build -o ./release/telegramBot.exe  | ls
+      - name: Install Pi
+        run: env GOOS=`linux` GOARCH=`arm` go build -o ./release/telegramBot  | ls
+      - name: Get  artifacts
       - name: Get  artifacts
         uses: actions/upload-artifact@v1
         with:
           name: telegramBot
-          path: ./telegBot
+          path: ./release

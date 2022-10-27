@@ -1,6 +1,7 @@
 .idea
 /pkg/
 /*.exe
+/.idea
 /users.json
 configuration/prod.properties
 telegBot
