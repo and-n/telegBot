@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/and-n/telegBot/botcode"
 	"github.com/magiconair/properties"
@@ -21,6 +23,17 @@ func main() {
 	} else {
 		p = properties.MustLoadFile("./configuration/file.properties", properties.UTF8)
 	}
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		sig := <-sigs
+		fmt.Println()
+		if sig == os.Interrupt {
+			
+		}
+		fmt.Println(sig)
+	}()
 
 	bot, updates := botcode.InitBot(p)
 

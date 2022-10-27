@@ -15,22 +15,29 @@ const fioApi = "https://www.fio.cz/ib_api/rest"
 const format = "transactions.json"
 
 func getBalance(key string) string {
-	tomorrow := time.Now().Add(time.Hour * 24).Format("2006-01-02")
-
-	requestURL := fmt.Sprintf("%s/%s", fioApi, "periods/"+key+"/"+tomorrow+"/"+tomorrow+"/"+format)
-	println(requestURL)
-	res, err := http.Get(requestURL)
-	if err != nil || res.StatusCode != 200 {
-		fmt.Printf("error making http request: %s\n", err)
-		return "error"
-	}
-
-	resBody, _ := ioutil.ReadAll(res.Body)
-
 	var balance Balance
-	json.Unmarshal([]byte(resBody), &balance)
+	if cacheBalance.Get(key) != nil {
+		fmt.Println("get from cache")
+		balance = cacheBalance.Get(key).Value()
+	} else {
 
-	fmt.Printf("client: got response!\n %s", resBody)
+		tomorrow := time.Now().Add(time.Hour * 24).Format("2006-01-02")
+
+		requestURL := fmt.Sprintf("%s/%s", fioApi, "periods/"+key+"/"+tomorrow+"/"+tomorrow+"/"+format)
+		println(requestURL)
+		res, err := http.Get(requestURL)
+		if err != nil || res.StatusCode != 200 {
+			fmt.Printf("error making http request: %s\n", err)
+			return "error"
+		}
+
+		resBody, _ := ioutil.ReadAll(res.Body)
+
+		json.Unmarshal([]byte(resBody), &balance)
+		fmt.Printf("client: got response!\n %s", resBody)
+
+		cacheBalance.Set(key, balance, time.Minute*5)
+	}
 
 	p := message.NewPrinter(language.English)
 

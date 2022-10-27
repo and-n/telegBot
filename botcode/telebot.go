@@ -1,8 +1,11 @@
 package botcode
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	ttlcache "github.com/jellydator/ttlcache/v3"
@@ -14,7 +17,7 @@ const version string = "0.2"
 var FIO string
 var KEY string
 
-// var cache *ttlcache.Cache
+var cacheBalance *ttlcache.Cache[string, Balance]
 
 // InitBot -init telegram bot
 func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesChannel) {
@@ -31,11 +34,11 @@ func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesCh
 
 	updates := bot.GetUpdatesChan(u)
 
-	cache := ttlcache.New[string, string]()
+	cacheBalance = ttlcache.New(
+		ttlcache.WithTTL[string, Balance](30 * time.Minute),
+	)
 
-
-
-	go cache.Start()
+	go cacheBalance.Start()
 
 	return bot, updates
 }
@@ -54,11 +57,12 @@ func loadProperties(props *properties.Properties) {
 func AnswerMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
 	var answer tgbotapi.MessageConfig
 	answer.ChatID = message.Chat.ID
+	answer.ChannelUsername = message.From.UserName
 	answer.Text = "kill me please"
 
 	if message.IsCommand() {
 		parseCommand(message.Command(), message.CommandArguments(), &answer)
-	} else if "" != message.Text {
+	} else if len(message.Text) != 0 {
 		answer.ReplyToMessageID = message.MessageID
 		parseString(message, &answer)
 	}
@@ -73,6 +77,9 @@ func parseCommand(command string, arguments string, answer *tgbotapi.MessageConf
 		answer.Text = help
 	case "balance":
 		answer.Text = getBalance(FIO)
+	case "kill":
+		fmt.Printf("Killed manually by %s \n", answer.ChannelUsername)
+		os.Exit(0)
 	default:
 		answer.Text = "Unknown!"
 	}
