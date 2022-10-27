@@ -28,11 +28,10 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		sig := <-sigs
-		fmt.Println()
-		if sig == os.Interrupt {
-			
-		}
 		fmt.Println(sig)
+		if sig == os.Interrupt {
+			os.Exit(0)
+		}
 	}()
 
 	bot, updates := botcode.InitBot(p)
