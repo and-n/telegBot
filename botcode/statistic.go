@@ -2,7 +2,6 @@ package botcode
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -24,7 +23,7 @@ func SaveStatistic(user *tgbotapi.User) {
 
 	var statFile, err = os.OpenFile(fileName, os.O_RDWR, 0666)
 	if err == nil {
-		result, _ := ioutil.ReadFile(statFile.Name())
+		result, _ := os.ReadFile(statFile.Name())
 		err = json.Unmarshal(result, &users)
 		if err != nil {
 			log.Println(err)
@@ -50,7 +49,7 @@ func SaveStatistic(user *tgbotapi.User) {
 
 func saveUsersStatToFile(usersMap map[int64]UserStat, file *os.File) {
 	jsn, _ := json.MarshalIndent(usersMap, " ", "")
-	er := ioutil.WriteFile(file.Name(), jsn, os.ModeExclusive)
+	er := os.WriteFile(file.Name(), jsn, os.ModeExclusive)
 	if er != nil {
 		log.Println(er)
 	}

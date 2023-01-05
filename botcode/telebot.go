@@ -17,7 +17,7 @@ const version string = "0.2"
 var FIO string
 var KEY string
 
-var cacheBalance *ttlcache.Cache[string, Balance]
+var cacheBalance *ttlcache.Cache[string, AccountStatement]
 
 // InitBot -init telegram bot
 func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesChannel) {
@@ -35,7 +35,7 @@ func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesCh
 	updates := bot.GetUpdatesChan(u)
 
 	cacheBalance = ttlcache.New(
-		ttlcache.WithTTL[string, Balance](30 * time.Minute),
+		ttlcache.WithTTL[string, AccountStatement](30 * time.Minute),
 	)
 
 	go cacheBalance.Start()
