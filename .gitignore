@@ -7,3 +7,4 @@ configuration/prod.properties
 telegBot
 telegBot_release
 ls
+.test.json

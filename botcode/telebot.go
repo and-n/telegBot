@@ -1,23 +1,17 @@
 package botcode
 
 import (
-	"fmt"
 	"log"
-	"os"
 	"strings"
-	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	ttlcache "github.com/jellydator/ttlcache/v3"
 	"github.com/magiconair/properties"
 )
 
-const version string = "0.2"
+const version string = "0.3"
 
 var FIO string
 var KEY string
-
-var cacheBalance *ttlcache.Cache[string, AccountStatement]
 
 // InitBot -init telegram bot
 func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesChannel) {
@@ -33,12 +27,6 @@ func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesCh
 	u.Timeout = 60
 
 	updates := bot.GetUpdatesChan(u)
-
-	cacheBalance = ttlcache.New(
-		ttlcache.WithTTL[string, AccountStatement](30 * time.Minute),
-	)
-
-	go cacheBalance.Start()
 
 	return bot, updates
 }
@@ -77,9 +65,9 @@ func parseCommand(command string, arguments string, answer *tgbotapi.MessageConf
 		answer.Text = help
 	case "balance":
 		answer.Text = getBalance(FIO)
-	case "kill":
-		fmt.Printf("Killed manually by %s \n", answer.ChannelUsername)
-		os.Exit(0)
+	// case "kill":
+	// 	fmt.Printf("Killed manually by %s \n", answer.ChannelUsername)
+	// 	os.Exit(0)
 	default:
 		answer.Text = "Unknown!"
 	}
@@ -97,6 +85,10 @@ func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
 	case "ver", "version":
 		answer.Text = version
 	default:
-		answer.Text = "Sorry"
+		answer.ReplyMarkup = tgbotapi.NewReplyKeyboard(
+			tgbotapi.NewKeyboardButtonRow(
+				tgbotapi.NewKeyboardButton("/balance"),
+			),
+		)
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	ttlcache "github.com/jellydator/ttlcache/v3"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -14,7 +15,21 @@ import (
 const fioApi = "https://www.fio.cz/ib_api/rest"
 const format = "transactions.json"
 
+var cacheBalance *ttlcache.Cache[string, AccountStatement]
+
+func init() {
+	cacheBalance = ttlcache.New(
+		ttlcache.WithTTL[string, AccountStatement](30 * time.Minute),
+	)
+
+	go cacheBalance.Start()
+}
+
+
 func getBalance(key string) string {
+	var data struct {
+		AccountStatement AccountStatement `json:"accountStatement"`
+	}
 	var balance AccountStatement
 	if cacheBalance.Get(key) != nil {
 		fmt.Println("get from cache")
@@ -33,8 +48,14 @@ func getBalance(key string) string {
 
 		resBody, _ := io.ReadAll(res.Body)
 
-		json.Unmarshal([]byte(resBody), &balance)
-		// fmt.Printf("client: got response!\n %s", resBody)
+		e := json.Unmarshal([]byte(resBody), &data)
+		if e != nil {
+			fmt.Println("Error:", e)
+			return ""
+		}
+		balance = data.AccountStatement
+		// fmt.Printf("client: got response!\n %s\n", resBody)
+		// fmt.Println(balance)
 
 		cacheBalance.Set(key, balance, time.Minute*5)
 	}
@@ -46,14 +67,22 @@ func getBalance(key string) string {
 
 type AccountStatement struct {
 	Info            Info
-	TransactionList string
+	TransactionList TransactionList
 }
 
 type Info struct {
 	Currency       string
-	ClosingBalance float32
-	AccountId      int64
-	BankId         int16
+	ClosingBalance float64
+	AccountId      string
+	BankId         string
 	Iban           string
 	Bic            string
+}
+
+type TransactionList struct {
+	Transaction []Transaction `json:"transaction"`
+}
+
+type Transaction struct {
+	// Add your transaction fields here
 }
