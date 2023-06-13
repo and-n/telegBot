@@ -10,7 +10,15 @@
             "request": "launch",
             "mode": "debug",
             "program": "starter.go"
-        }
+        },
        
+        {
+            "name": "PROD",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "starter.go",
+            "args": ["./configuration/prod.properties"]
+        }
     ]
 }

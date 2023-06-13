@@ -48,6 +48,13 @@ func AnswerMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
 	answer.ChannelUsername = message.From.UserName
 	answer.Text = "kill me please"
 
+	answer.ReplyMarkup = tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("balance"),
+			tgbotapi.NewKeyboardButton("help"),
+		),
+	)
+
 	if message.IsCommand() {
 		parseCommand(message.Command(), message.CommandArguments(), &answer)
 	} else if len(message.Text) != 0 {
@@ -61,10 +68,16 @@ func AnswerMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
 func parseCommand(command string, arguments string, answer *tgbotapi.MessageConfig) {
 	// log.Println("command", command, "arg ", arguments, "at", at)
 	switch command {
-	case "help":
-		answer.Text = help
+
 	case "balance":
 		answer.Text = getBalance(FIO)
+	case "api":
+		if len(arguments) == 0 {
+			answer.Text = "/api YOUR_KEY"
+		} else {
+			answer.Text = "your api: " + arguments
+		}
+
 	// case "kill":
 	// 	fmt.Printf("Killed manually by %s \n", answer.ChannelUsername)
 	// 	os.Exit(0)
@@ -73,7 +86,7 @@ func parseCommand(command string, arguments string, answer *tgbotapi.MessageConf
 	}
 }
 
-const help string = "ping, hi, ver"
+const help string = "ping, hi, ver, balance"
 
 func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
 
@@ -84,11 +97,16 @@ func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
 		answer.Text = "Hello, " + message.From.UserName
 	case "ver", "version":
 		answer.Text = version
+	case "balance":
+		answer.Text = getBalance(FIO)
+
+	case "api":
+		answer.Text = "/api YOUR_KEY"
+		answer.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+	case "help":
+		answer.Text = help
 	default:
-		answer.ReplyMarkup = tgbotapi.NewReplyKeyboard(
-			tgbotapi.NewKeyboardButtonRow(
-				tgbotapi.NewKeyboardButton("/balance"),
-			),
-		)
+		answer.Text = "Unknown!"
 	}
+
 }
