@@ -48,12 +48,7 @@ func AnswerMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
 	answer.ChannelUsername = message.From.UserName
 	answer.Text = "kill me please"
 
-	answer.ReplyMarkup = tgbotapi.NewReplyKeyboard(
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("balance"),
-			tgbotapi.NewKeyboardButton("help"),
-		),
-	)
+	answer.ReplyMarkup = createButtons()
 
 	if message.IsCommand() {
 		parseCommand(message.Command(), message.CommandArguments(), &answer)
@@ -109,4 +104,14 @@ func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
 		answer.Text = "Unknown!"
 	}
 
+}
+
+func createButtons() tgbotapi.ReplyKeyboardMarkup {
+	buttons := tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("balance"),
+			tgbotapi.NewKeyboardButton("help"),
+		),
+	)
+	return buttons
 }
