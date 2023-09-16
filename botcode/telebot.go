@@ -1,23 +1,18 @@
 package botcode
 
 import (
-	"fmt"
 	"log"
-	"os"
+	"strconv"
 	"strings"
-	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	ttlcache "github.com/jellydator/ttlcache/v3"
 	"github.com/magiconair/properties"
 )
 
-const version string = "0.2"
+const version string = "0.3"
 
 var FIO string
 var KEY string
-
-var cacheBalance *ttlcache.Cache[string, AccountStatement]
 
 // InitBot -init telegram bot
 func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesChannel) {
@@ -33,12 +28,6 @@ func InitBot(props *properties.Properties) (*tgbotapi.BotAPI, tgbotapi.UpdatesCh
 	u.Timeout = 60
 
 	updates := bot.GetUpdatesChan(u)
-
-	cacheBalance = ttlcache.New(
-		ttlcache.WithTTL[string, AccountStatement](30 * time.Minute),
-	)
-
-	go cacheBalance.Start()
 
 	return bot, updates
 }
@@ -60,6 +49,8 @@ func AnswerMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
 	answer.ChannelUsername = message.From.UserName
 	answer.Text = "kill me please"
 
+	answer.ReplyMarkup = createButtons()
+
 	if message.IsCommand() {
 		parseCommand(message.Command(), message.CommandArguments(), &answer)
 	} else if len(message.Text) != 0 {
@@ -73,19 +64,42 @@ func AnswerMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
 func parseCommand(command string, arguments string, answer *tgbotapi.MessageConfig) {
 	// log.Println("command", command, "arg ", arguments, "at", at)
 	switch command {
-	case "help":
-		answer.Text = help
+
 	case "balance":
 		answer.Text = getBalance(FIO)
-	case "kill":
-		fmt.Printf("Killed manually by %s \n", answer.ChannelUsername)
-		os.Exit(0)
+	case "api":
+		if len(arguments) == 0 {
+			answer.Text = "/api YOUR_KEY"
+		} else {
+			answer.Text = "your api: " + arguments
+		}
+	case "month":
+		if len(arguments) == 0 {
+			answer.Text = "/month MONTH_NUMBER"
+		} else {
+			m, err := strconv.ParseInt(arguments, 10, 0)
+			if err != nil {
+				answer.Text = "Wrong month number"
+			} else {
+				res, err := getSumByMonthAsString(FIO, int(m))
+				if err != nil {
+					answer.Text = err.Error()
+				} else {
+					answer.Text = res
+				}
+			}
+
+		}
+
+	// case "kill":
+	// 	fmt.Printf("Killed manually by %s \n", answer.ChannelUsername)
+	// 	os.Exit(0)
 	default:
 		answer.Text = "Unknown!"
 	}
 }
 
-const help string = "ping, hi, ver"
+const help string = "ping, hi, ver, balance"
 
 func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
 
@@ -96,7 +110,29 @@ func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
 		answer.Text = "Hello, " + message.From.UserName
 	case "ver", "version":
 		answer.Text = version
+	case "balance":
+		answer.Text = getBalance(FIO)
+
+	case "api":
+		answer.Text = "/api YOUR_KEY"
+		answer.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+	case "help":
+		answer.Text = help
+	case "month":
+		answer.Text = "/month MONTH_NUMBER"
+
 	default:
-		answer.Text = "Sorry"
+		answer.Text = "Unknown!"
 	}
+
+}
+
+func createButtons() tgbotapi.ReplyKeyboardMarkup {
+	buttons := tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("balance"),
+			tgbotapi.NewKeyboardButton("help"),
+		),
+	)
+	return buttons
 }
