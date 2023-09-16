@@ -2,6 +2,7 @@ package botcode
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -72,6 +73,23 @@ func parseCommand(command string, arguments string, answer *tgbotapi.MessageConf
 		} else {
 			answer.Text = "your api: " + arguments
 		}
+	case "month":
+		if len(arguments) == 0 {
+			answer.Text = "/month MONTH_NUMBER"
+		} else {
+			m, err := strconv.ParseInt(arguments, 10, 0)
+			if err != nil {
+				answer.Text = "Wrong month number"
+			} else {
+				res, err := getSumByMonthAsString(FIO, int(m))
+				if err != nil {
+					answer.Text = err.Error()
+				} else {
+					answer.Text = res
+				}
+			}
+
+		}
 
 	// case "kill":
 	// 	fmt.Printf("Killed manually by %s \n", answer.ChannelUsername)
@@ -100,6 +118,9 @@ func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
 		answer.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 	case "help":
 		answer.Text = help
+	case "month":
+		answer.Text = "/month MONTH_NUMBER"
+
 	default:
 		answer.Text = "Unknown!"
 	}
