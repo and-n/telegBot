@@ -37,13 +37,21 @@ func main() {
 	bot, updates := botcode.InitBot(p)
 
 	for update := range updates {
-		if update.Message == nil { // ignore any non-Message Updates
-			continue
-		}
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-		go botcode.SaveStatistic(update.Message.From)
 
-		go botcode.AnswerMessage(update.Message, bot)
+		if update.CallbackQuery != nil {
+			go botcode.SaveStatistic(update.CallbackQuery.From)
+
+			go botcode.AnswerInlineQuery(update.CallbackQuery, bot)
+		} else {
+
+			if update.Message == nil { // ignore any non-Message Updates
+				continue
+			}
+			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			go botcode.SaveStatistic(update.Message.From)
+
+			go botcode.AnswerMessage(update.Message, bot)
+		}
 
 	}
 
