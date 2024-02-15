@@ -131,7 +131,7 @@ func getSumByMonth(key string, month int) (Balance, error) {
 
 func getFirstAndLastDayOfMonth(month int) (first time.Time, last time.Time, err error) {
 	if month <= 0 || month > 12 {
-		return time.Time{}, time.Time{}, errors.New("wrong month number")
+		return time.Time{}, time.Time{}, errors.New("wrong month number " + strconv.Itoa(month))
 	}
 
 	today := time.Now()

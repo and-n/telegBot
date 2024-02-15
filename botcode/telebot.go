@@ -161,8 +161,8 @@ func getMonthKeyboard() tgbotapi.InlineKeyboardMarkup {
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(time.Now().Month().String(), "month:"+strconv.Itoa(int(time.Now().Month()))),
-			tgbotapi.NewInlineKeyboardButtonData(time.Now().Add(time.Hour*(-30*24)).Month().String(), "month:"+strconv.Itoa(int(time.Now().Month())-1)),
-			tgbotapi.NewInlineKeyboardButtonData(time.Now().Add(time.Hour*(-60*24)).Month().String(), "month:"+strconv.Itoa(int(time.Now().Month())-2)),
+			tgbotapi.NewInlineKeyboardButtonData(time.Now().Add(time.Hour*(-30*24)).Month().String(), "month:"+strconv.Itoa(int(time.Now().Add(time.Hour*(-30*24)).Month()))),
+			tgbotapi.NewInlineKeyboardButtonData(time.Now().Add(time.Hour*(-60*24)).Month().String(), "month:"+strconv.Itoa(int(time.Now().Add(time.Hour*(-60*24)).Month()))),
 		),
 	)
 	return keyboard
