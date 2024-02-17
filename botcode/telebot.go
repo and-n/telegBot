@@ -161,9 +161,32 @@ func getMonthKeyboard() tgbotapi.InlineKeyboardMarkup {
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(time.Now().Month().String(), "month:"+strconv.Itoa(int(time.Now().Month()))),
-			tgbotapi.NewInlineKeyboardButtonData(time.Now().Add(time.Hour*(-30*24)).Month().String(), "month:"+strconv.Itoa(int(time.Now().Add(time.Hour*(-30*24)).Month()))),
-			tgbotapi.NewInlineKeyboardButtonData(time.Now().Add(time.Hour*(-60*24)).Month().String(), "month:"+strconv.Itoa(int(time.Now().Add(time.Hour*(-60*24)).Month()))),
+			tgbotapi.NewInlineKeyboardButtonData(monthChange(time.Now().Month(), -1).String(), "month:"+strconv.Itoa(int(monthChange(time.Now().Month(), -1)))),
+			tgbotapi.NewInlineKeyboardButtonData(monthChange(time.Now().Month(), -2).String(), "month:"+strconv.Itoa(int(monthChange(time.Now().Month(), -2)))),
 		),
 	)
 	return keyboard
+}
+
+func monthChange(month time.Month, change int) time.Month {
+	if change == 0 {
+		return month
+	}
+	var newMonth int
+	if change > 0 {
+		newMonth = int(month) + change%12
+		if int(newMonth) <= 12 {
+			return time.Month(newMonth)
+		} else {
+			return time.Month(newMonth % 12)
+		}
+	} else {
+		newMonth = int(month) + change%12
+		if newMonth > 0 {
+			return time.Month(newMonth)
+		} else {
+			return time.Month(12 + newMonth)
+		}
+	}
+
 }
