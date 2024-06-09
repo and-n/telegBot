@@ -4,12 +4,13 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/magiconair/properties"
 )
 
-const version string = "0.3"
+const version string = "0.4"
 
 var FIO string
 var KEY string
@@ -59,6 +60,24 @@ func AnswerMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
 	}
 
 	bot.Send(answer)
+}
+
+func AnswerInlineQuery(query *tgbotapi.CallbackQuery, bot *tgbotapi.BotAPI) {
+	println(query.Data)
+	splitted := strings.Split(query.Data, ":")
+	if len(splitted) > 1 {
+		if splitted[0] == "month" {
+			month, _ := strconv.ParseInt(splitted[1], 10, 0)
+			sum, err := getSumByMonthAsString(FIO, int(month))
+			if err != nil {
+				bot.Send(tgbotapi.NewMessage(query.From.ID, err.Error()))
+			} else {
+				bot.Send(tgbotapi.NewMessage(query.From.ID, time.Month(month).String()+":\n"+sum))
+			}
+		} else {
+			bot.Send(tgbotapi.NewMessage(query.From.ID, "error"))
+		}
+	}
 }
 
 func parseCommand(command string, arguments string, answer *tgbotapi.MessageConfig) {
@@ -120,7 +139,7 @@ func parseString(message *tgbotapi.Message, answer *tgbotapi.MessageConfig) {
 		answer.Text = help
 	case "month":
 		answer.Text = "/month MONTH_NUMBER"
-
+		answer.ReplyMarkup = getMonthKeyboard()
 	default:
 		answer.Text = "Unknown!"
 	}
@@ -131,8 +150,43 @@ func createButtons() tgbotapi.ReplyKeyboardMarkup {
 	buttons := tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("balance"),
+			tgbotapi.NewKeyboardButton("month"),
 			tgbotapi.NewKeyboardButton("help"),
 		),
 	)
 	return buttons
+}
+
+func getMonthKeyboard() tgbotapi.InlineKeyboardMarkup {
+	keyboard := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(time.Now().Month().String(), "month:"+strconv.Itoa(int(time.Now().Month()))),
+			tgbotapi.NewInlineKeyboardButtonData(monthChange(time.Now().Month(), -1).String(), "month:"+strconv.Itoa(int(monthChange(time.Now().Month(), -1)))),
+			tgbotapi.NewInlineKeyboardButtonData(monthChange(time.Now().Month(), -2).String(), "month:"+strconv.Itoa(int(monthChange(time.Now().Month(), -2)))),
+		),
+	)
+	return keyboard
+}
+
+func monthChange(month time.Month, change int) time.Month {
+	if change == 0 {
+		return month
+	}
+	var newMonth int
+	if change > 0 {
+		newMonth = int(month) + change%12
+		if int(newMonth) <= 12 {
+			return time.Month(newMonth)
+		} else {
+			return time.Month(newMonth % 12)
+		}
+	} else {
+		newMonth = int(month) + change%12
+		if newMonth > 0 {
+			return time.Month(newMonth)
+		} else {
+			return time.Month(12 + newMonth)
+		}
+	}
+
 }
