@@ -14,7 +14,7 @@ import (
 	"golang.org/x/text/message"
 )
 
-const fioApi = "https://www.fio.cz/ib_api/rest"
+const fioApi = "https://fioapi.fio.cz/v1/rest"
 const format = "transactions.json"
 const dateFormat = "2006-01-02"
 
@@ -98,8 +98,13 @@ func getSumByMonth(key string, month int) (Balance, error) {
 
 		res, err := getRequest(requestURL)
 		if err != nil || res.StatusCode != 200 {
-			fmt.Printf("error making http request: %d %s\n", res.StatusCode, err)
-			return Balance{}, errors.New("error making http request")
+			if res.StatusCode == 422 {
+				fmt.Printf("error making http request: %d %s\n", res.StatusCode, err)
+				return Balance{}, errors.New("you can't get data for more than 90 days")
+			} else {
+				fmt.Printf("error making http request: %d %s\n", res.StatusCode, err)
+				return Balance{}, errors.New("error making http request")
+			}
 		}
 
 		var data struct {
